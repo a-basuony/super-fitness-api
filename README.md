@@ -288,4 +288,5 @@ npm run docker             # Start development Docker containers
 **Super Fitness API** - TEAM A
 #   s u p e r - f i t n e s s - a p i  
  #   s u p e r - f i t n e s s - a p i  
+ #   f i t n e s s - a p i  
  
