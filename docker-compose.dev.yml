@@ -1,0 +1,38 @@
+services:
+  postgres-db:
+    image: postgres:16.2-alpine3.19
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 5440:5432
+    environment:
+      POSTGRES_DB: fitness-app
+      POSTGRES_USER: fitness-app
+      POSTGRES_PASSWORD: fitness-app
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U fitness-app -d fitness-app"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+
+volumes:
+  pgdata:

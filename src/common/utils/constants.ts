@@ -1,0 +1,2 @@
+export const CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP(6)';
+export const GEMINI_MODEL = 'GEMINI_MODEL';
