@@ -570,7 +570,7 @@ A comprehensive, production-ready backend service for a fitness platform built w
 
 ### Prerequisites
 
-- **Node.js**: v18.0.0 or higher
+- **Node.js**: v20.0.0 or higher (required for NestJS 11)
 - **npm**: v9.0.0 or higher
 - **Docker**: Latest version (for dev environment)
 - **Git**: For version control
@@ -580,8 +580,8 @@ A comprehensive, production-ready backend service for a fitness platform built w
 #### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd super-fitness-api-team-a-main
+git clone https://github.com/a-basuony/super-fitness-api.git
+cd super-fitness-api
 ```
 
 #### 2. Install Dependencies
@@ -605,10 +605,10 @@ cp .env.example .env
 
 ```bash
 # Database
-DATABASE_HOST=postgres
-DATABASE_PORT=5432
+DATABASE_HOST=localhost
+DATABASE_PORT=5440
 DATABASE_USER=fitness-app
-DATABASE_PASSWORD=fitness-app
+DATABASE_PASSWORD=change-me-for-local-dev
 DATABASE_NAME=fitness-app
 
 # JWT
@@ -631,40 +631,34 @@ SMTP_PASS=your_app_password
 SMTP_FROM=noreply@fitness.app
 
 # RabbitMQ
-RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+RABBITMQ_URL=amqp://guest:guest@localhost:5672
 ```
+
+The settings above assume the NestJS application runs on your host while PostgreSQL and RabbitMQ run via Docker Compose. Do not use the internal container hostnames (`postgres-db`/`rabbitmq`) from a host process. The development Compose configuration uses the same PostgreSQL credentials from `.env` when the database is first initialized.
 
 #### 4. Start Development Infrastructure
 
 ```bash
-# Start PostgreSQL, RabbitMQ, and other services
+# Start PostgreSQL and RabbitMQ
 npm run docker
 ```
 
 This command runs:
 
-- PostgreSQL database (port 5432)
-- RabbitMQ message broker (port 5672)
-- Redis (optional)
+- PostgreSQL database (host port `5440`, container port `5432`)
+- RabbitMQ message broker (port `5672`, management UI `15672`)
 
-#### 5. Run Database Migrations
+The NestJS application is not started by this command.
 
-TypeORM auto-syncs in development mode. For a fresh start:
-
-```bash
-# The app auto-creates/updates schema on startup in dev mode
-npm run start:dev
-```
-
-#### 6. Start Development Server
+#### 5. Start Development Server
 
 ```bash
 npm run start:dev
 ```
 
-Server runs at `http://localhost:3000`
+In development mode TypeORM synchronizes the schema at application startup. The server runs at `http://localhost:3000`.
 
-#### 7. Access Documentation
+#### 6. Access Documentation
 
 Open in browser: `http://localhost:3000/api-docs`
 
