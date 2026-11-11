@@ -1048,9 +1048,9 @@ NODE_ENV=development
 
 # Database
 DATABASE_HOST=localhost
-DATABASE_PORT=5432
+DATABASE_PORT=5440
 DATABASE_USER=fitness-app
-DATABASE_PASSWORD=fitness-app
+DATABASE_PASSWORD=change-me-for-local-dev
 DATABASE_NAME=fitness-app
 
 # JWT
@@ -1131,11 +1131,14 @@ node --inspect-brk -r tsconfig-paths/register -r ts-node/register dist/main.js
 npm run docker
 ```
 
-Starts:
+Starts **only the dependencies** (not the API server):
 
-- PostgreSQL (port 5432)
-- RabbitMQ (port 5672)
-- Application (port 3000)
+- PostgreSQL: host port `5440` → container port `5432`
+- RabbitMQ: host port `5672` (management UI `15672`)
+
+The Compose file reads `DATABASE_NAME`, `DATABASE_USER`, and `DATABASE_PASSWORD` from your local `.env`. Set matching values in your application config before first run. If you previously initialized the `pgdata` volume with different credentials, changing `.env` does not update an existing database user; repair the credentials explicitly rather than deleting data.
+
+Run `npm run start:dev` **in another terminal** to start the NestJS API on the host. Set `DATABASE_HOST=localhost` and `DATABASE_PORT=5440` for this arrangement; a Node process running inside the Compose network should instead use `postgres-db:5432`.
 
 #### Production Build
 
@@ -1150,17 +1153,17 @@ docker build -t fitness-api:v1.0.0 -f Dockerfile.prod .
 ### Docker Compose
 
 ```bash
-# Development
-docker-compose -f docker-compose.dev.yml up -d
+# Development: from the repository root with .env configured
+docker compose -f docker-compose.dev.yml up -d
 
 # Production
 docker-compose -f docker-compose.production.yml up -d
 
-# Stop services
-docker-compose down
+# Stop the development dependencies (preserves the database volume)
+docker compose -f docker-compose.dev.yml down
 
-# View logs
-docker-compose logs -f app
+# View logs for the two services
+docker compose -f docker-compose.dev.yml logs -f postgres-db rabbitmq
 ```
 
 ### Environment Setup for Production
