@@ -2,16 +2,16 @@ services:
   postgres-db:
     image: postgres:16.2-alpine3.19
     restart: always
-    env_file:
-      - .env
     ports:
-      - 5440:5432
+      - "5440:5432"
     environment:
-      POSTGRES_DB: fitness-app
-      POSTGRES_USER: fitness-app
-      POSTGRES_PASSWORD: fitness-app
-    healthcheck: 
-      test: ["CMD-SHELL", "pg_isready -U fitness-app -d fitness-app"]
+      # Compose loads .env for substitution; do not inject unrelated app secrets into Postgres.
+      POSTGRES_DB: ${DATABASE_NAME:?Set DATABASE_NAME in .env}
+      POSTGRES_USER: ${DATABASE_USER:?Set DATABASE_USER in .env}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Set DATABASE_PASSWORD in .env}
+    healthcheck:
+      # Escape $ for Compose so the container expands its own Postgres variables.
+      test: ["CMD-SHELL", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
       interval: 5s
       timeout: 5s
       retries: 5
